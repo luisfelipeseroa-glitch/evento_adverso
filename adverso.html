@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificação de Eventos Adversos - Unidade de Saúde</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 700px; background: #ffffff; margin: auto; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { color: #1a73e8; border-bottom: 2px solid #e8f0fe; padding-bottom: 15px; margin-top: 0; text-align: center; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.9em; }
+        
+        .section-title { font-weight: bold; margin: 25px 0 15px 0; color: #1a73e8; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; display: flex; align-items: center; }
+        .section-title::after { content: ""; flex: 1; height: 1px; background: #e8f0fe; margin-left: 10px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95em; }
+        
+        input[type="text"], input[type="date"], input[type="time"], select, textarea {
+            width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: border 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #1a73e8; outline: none; box-shadow: 0 0 0 2px rgba(26,115,232,0.1); }
+        
+        textarea { height: 120px; resize: vertical; }
+        
+        .radio-group { display: flex; gap: 20px; padding: 10px 0; }
+        .radio-group label { font-weight: normal; display: flex; align-items: center; cursor: pointer; }
+        .radio-group input { margin-right: 8px; }
+
+        .btn-submit { background-color: #1a73e8; color: white; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 30px; transition: background 0.3s; }
+        .btn-submit:hover { background-color: #1557b0; }
+        .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Gestão de Incidentes</h2>
+    <p class="subtitle">Sua notificação é fundamental para a melhoria da segurança do paciente.</p>
+
+    <form id="formNotificacao">
+        <div class="section-title">1. Quando e Onde</div>
+        <div class="grid">
+            <div class="form-group">
+                <label for="data">Data da Ocorrência*</label>
+                <input type="date" id="data" required>
+            </div>
+            <div class="form-group">
+                <label for="hora">Hora aproximada</label>
+                <input type="time" id="hora">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="setor">Setor / Unidade*</label>
+            <select id="setor" required>
+                <option value="">Selecione o local...</option>
+                <option value="Ambulatório">Ambulatório</option>
+                <option value="Emergência">Emergência</option>
+                <option value="UTI">UTI</option>
+                <option value="Enfermaria">Enfermaria</option>
+                <option value="Centro Cirúrgico">Centro Cirúrgico</option>
+                <option value="Farmácia">Farmácia</option>
+                <option value="Recepção">Recepção</option>
+            </select>
+        </div>
+
+        <div class="section-title">2. O que aconteceu</div>
+        <div class="form-group">
+            <label for="tipo">Tipo de Evento*</label>
+            <select id="tipo" required>
+                <option value="">Selecione o tipo...</option>
+                <option value="Queda">Queda</option>
+                <option value="Erro de Medicação">Erro de Medicação</option>
+                <option value="Identificação do Paciente">Falha de Identificação</option>
+                <option value="Lesão por Pressão">Lesão por Pressão (LPP)</option>
+                <option value="Artigo/Equipamento">Problema com Equipamento</option>
+                <option value="Outro">Outro incidente</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Houve dano ao paciente?*</label>
+            <div class="radio-group">
+                <label><input type="radio" name="dano" value="Sim" required> Sim</label>
+                <label><input type="radio" name="dano" value="Não"> Não (Near Miss)</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="descricao">Descrição dos Fatos*</label>
+            <textarea id="descricao" placeholder="Relate o ocorrido de forma objetiva..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="conduta">Conduta Imediata</label>
+            <textarea id="conduta" placeholder="Quais medidas foram tomadas na hora?"></textarea>
+        </div>
+
+        <div class="section-title">3. Identificação</div>
+        <div class="form-group">
+            <label for="notificador">Seu Nome ou Cargo (Opcional)</label>
+            <input type="text" id="notificador" placeholder="Pode deixar em branco para anonimato">
+        </div>
+
+        <button type="submit" id="btnSubmit" class="btn-submit">Enviar Notificação</button>
+    </form>
+</div>
+
+<script>
+    // URL que você forneceu do Google Apps Script
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYiBW37WQcDse5BS1CyLiNo6llEb1__kBlpJ0FIrGmkn76s-FiVvNTnHJoxZ69a0krcQ/exec";
+
+    document.getElementById('formNotificacao').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btnSubmit');
+        btn.disabled = true;
+        btn.innerText = "Processando...";
+
+        const payload = {
+            data: document.getElementById('data').value,
+            hora: document.getElementById('hora').value,
+            setor: document.getElementById('setor').value,
+            tipo: document.getElementById('tipo').value,
+            dano: document.querySelector('input[name="dano"]:checked').value,
+            descricao: document.getElementById('descricao').value,
+            conduta: document.getElementById('conduta').value,
+            notificador: document.getElementById('notificador').value || "Anônimo"
+        };
+
+        // Envio para o Google Sheets via fetch
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            alert('Sucesso! A notificação foi enviada para a planilha da Unidade.');
+            document.getElementById('formNotificacao').reset();
+        })
+        .catch(error => {
+            alert('Erro ao conectar com a planilha. Verifique a internet.');
+            console.error('Erro:', error);
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerText = "Enviar Notificação";
+        });
+    });
+</script>
+
+</body>
+</html>
